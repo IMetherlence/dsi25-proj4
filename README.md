@@ -1,153 +1,176 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Kaggle Competition - Starter
+<img src="http://imgur.com/1ZcRyrc.png" style="float: left; margin: 20px; height: 55px">
 
-## Introduction
+# Project 4 - West Nile Virus Prediction
 
-Welcome to your first week of work at the Disease And Treatment Agency, division of Societal Cures In Epidemiology and New Creative Engineering (DATA-SCIENCE). Time to get to work!
+--- 
 
-Due to the recent epidemic of West Nile Virus in the Windy City, we've had the Department of Public Health set up a surveillance and control system. We're hoping it will let us learn something from the mosquito population as we collect data over time. Pesticides are a necessary evil in the fight for public health and safety, not to mention expensive! We need to derive an effective plan to deploy pesticides throughout the city, and that is **exactly** where you come in!
+# Executive Summary
 
-## Dataset
+The West Nile Virus (WNV) is a mosquito-borne disease commonly transmitted to humans via the bite of an infected mosquito. The aim of this project was to build a model to predict where pesticides should be sprayed to effectively target WNV in the city of Chicago, Illinois. As part of the Disease And Treatment Agency, we were provided data of mosquito traps (with information on whether WNV was detected), data on pesticide spraying and data on weather conditions. Through exploratory data analysis of the data, we noted that various weather factors such as temperature, relative humidity and precipitation could affect the reproduction and survival rates of mosquitoes, increasing the prevalence of WNV. Analysis on time and seasonality showed that WNV season started in July and lasted till September with the peak in August. The spray dataset was used for data visualisation and showed that there was little change in the number of WNV mosquitoes after spraying - this may be attributed to ineffective spraying, where WNV high risk areas were not sprayed.
 
-The dataset, along with description, can be found here: [https://www.kaggle.com/c/predict-west-nile-virus/](https://www.kaggle.com/c/predict-west-nile-virus/).
+A total of 4 models were evaluated - (i) Logistic Regression; (ii) Support Vector Classifier; (iii) K-Nearest Neighbors (KNN); and (iv) Random Forest. The data was split into a training and testing dataset. Our target was to achieve an ROC AUC score as well as a recall score of at least 0.7, with Synthetic Minority Oversampling Technique (SMOTE) used in the modelling. Out of the 4 models, only Logistic Regression met the target. It had a testing ROC AUC score of 0.8, and a testing recall score of 0.75. KNN was our baseline model and it had a testing ROC AUC score of 0.75, and a testing recall score of 0.54. The low recall score means many false negatives were predicted by the KNN model, which is unfavourable.
 
-**This is also where you will be submitting your code for evaluation**. We will be using the Kaggle Leaderboard to keep track of your score. The public leaderboard uses roughly 30% of the dataset to score an AUC (Area Under Curve) metric.
+A cost-benefit analysis was also done on the data. The costs analysed include the cost of the spraying of pesticides. The benefits analysed include the cost avoidance of medical and productivity costs from preventing cases of WNV through the spraying of pesticides in Chicago. The analysis found that the benefit-cost ratio would be >= 1 if we prevented 100 WNV cases. Spraying the whole of Chicago on a weekly basis was observed to be a costly and inefficient endeavour if undertaken. A more effective approach would be to target spraying at areas that have a high predicted probability of WNV outbreak.
 
-> If you do not already have a Kaggle account, you will need to sign up on the website.  Also note that you will be submitting a "Late Submission" on Kaggle because the official competition has ended.  You can use the leaderboard to see how your results compare against roughly 1300 other data science teams!
+The project found that presence of WNV was affected by time of year, with the mosquito season peaking in July to September. The three biggest weather indicators that affected the mosquito outbreak was temperature, humidity, and precipitation. Rain generally led to less mosquitoes in the short term, likely due to disturbance of stagnant water bodies. However, a spike in mosquitoes was also possible after the rain due to creation of new stagnant water bodies. It was discovered that past spray campaigns were poorly targeted and had limited impact on containing the WNV outbreak. Spraying in 2013 took place within range of less than 20% of infected areas.
 
-You can submit predictions as many times as you want to Kaggle, but there is a limit of 5 submissions per day.  Be intentional with your submissions!
+We concluded that weather forecasts should be used to direct spraying efforts, with special attention being paid to periods of warm weather following recent rainfall. Our prediction model should be used to guide future spray campaigns, such as being linked to a frontend application for scientists and biologists to use when collecting mosquito samples. By keying in the relevant data needed as input to the model, they will be able to gauge the probability of WNV being present in the trap.
+
+# Problem Statement
+
+As part of the Disease And Treatment Agency, division of Societal Cures In Epidemiology and New Creative Engineering (DATA-SCIENCE), we intend to build a model that can predict where pesticides should be sprayed in the city of Chicago to counter the West Nile Virus. We will use Logistic Regression, Random Forest, K-Nearest Neighbours and the Support Vector Classifier as candidate models. The models will mainly be evaluated by their ROC AUC score and their recall score. We define a successful model as one with ROC AUC and Recall scores of at least 0.7. Lastly, we will produce a cost-benefit analysis to study the benefits of spraying pesticides versus the cost of spraying them.
+
+# Background and Research
+
+The WNV is the top reason for mosquito-borne disease in the continental United States area ([*source*](https://www.cdc.gov/westnile/index.html)). WNV is of particular concern in the Midwestern state of Illnois, where the case and death counts had surpassed all other states in the United States by end-2002 ([*source*](https://dph.illinois.gov/topics-services/diseases-and-conditions/west-nile-virus)). Chicago, Illinois is usually in the top 5 on Orkin's list of the Top 50 Mosquito Cities in the US ([*source*](https://www.nbcchicago.com/news/local/chicago-named-one-of-the-worst-cities-for-mosquitoes-in-us/2517461/)) \([*source*](https://www.orkin.com/press-room/orkin-releases-top-50-mosquito-cities-list)).
+
+Approximately 1 out of every 5 people who are infected develop West Nile Fever, with the symptoms being fever, diarrhoea, vomiting, headaches, body/joint aches, rashes and swollen lymph glands ([*source*](https://www.cdc.gov/westnile/symptoms/index.html)). Frailness and exhaustion from the illness can extend to weeks or months after the onset of the fever ([*source*](https://www.cdc.gov/westnile/symptoms/index.html)). 1 out of 150 develop a severe form of disease which is neuroinvasive in nature (e.g. West Nile encephalitis, meningitis or poliomyelitis) ([*source*](https://www.who.int/news-room/fact-sheets/detail/west-nile-virus)). The symptoms include "high fever, headache, neck stiffness, stupor, disorientation, coma, tremors, convulsions, muscle weakness, vision loss, numbness and paralysis" ([*source*](https://www.who.int/news-room/fact-sheets/detail/west-nile-virus)). There may be permanent damage to the central nervous system, with approximately 1 in 10 who are seriously affected dying ([*source*](https://www.cdc.gov/westnile/symptoms/index.html)). For those who survive, it may take weeks or months to recover ([*source*](https://www.cdc.gov/westnile/symptoms/index.html)). 
+
+Although people of all ages can get severe illness, the risk of severe illness for people above 60 increases from 1 in 150, to 1 in 50 ([*source*](https://www.cdc.gov/westnile/symptoms/index.html)). Infants and immunocompromised people are also more neurologically susceptible and at risk of death ([*source*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4939899/)). Other examples of people in the at-risk population are those who have a history of organ transplants, or have prexisting conditions such as cancer, diabetes, hypertension and kidney disease ([*source*](https://www.cdc.gov/westnile/symptoms/index.html)).  There is currently no treatment or vaccine for WNV, only medications for symptomatic relief ([*source*](https://www.cdc.gov/westnile/healthcareproviders/healthCareProviders-TreatmentPrevention.html)). Thus, it is imperative that the problem of WNV is attended to. With respect to this, WNV is mainly tackled at the transmission stage. This entails efforts to reduce the population of mosquitoes, or limit personal exposure to mosquites (e.g. by using mosquito repellents) ([*source*](https://www.cdc.gov/westnile/healthcareproviders/healthCareProviders-TreatmentPrevention.html)). 
+
+Transmission of WNV is most commonly spread through the bite of an infected mosquito, where the mosquitoes themselves are infected from feeding on infected birds ([*source*](https://www.cdc.gov/westnile/transmission/index.html)). Birds act as reservoirs of the virus, with the virus multiplying in their blood for several days ([*source*](https://www.who.int/news-room/fact-sheets/detail/west-nile-virus)). The virus infects over 250 bird species ([*source*](https://cwhl.vet.cornell.edu/disease/west-nile-virus)). Humans and horses are only infected, but do not act as spreaders of the virus ([*source*](https://www.who.int/news-room/fact-sheets/detail/west-nile-virus)). The exception is transmission through breastfeeding, although that is rare ([*source*](https://www.webmd.com/a-to-z-guides/west-nile-virus-faq)). Culex mosquitoes are the main vectors of the virus, especially Culex pipiens ([*source*](https://www.who.int/news-room/fact-sheets/detail/west-nile-virus)). The mosquito population is the highest in summer, and the WNV season generally reaches its height in  August and September ([*source*](https://www.webmd.com/a-to-z-guides/west-nile-virus-faq)). The mosquito season in Illinois is from early April to mid-October ([*source*](https://cristtermite.com/2021/10/when-does-mosquito-season-end-in-illinois/)).
+
+Increased temperatures can contribute to the spread of the virus by promoting viral replication rates in mosquitoes, viral transmisison to birds, and mosquito/bird population growth ([*source*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4342965/)). The mosquito population reduces when the temperature drops below 50°F for a prolonged length of time ([*source*](https://cristtermite.com/2021/10/when-does-mosquito-season-end-in-illinois/)). Increased precipitation and wind can promote the reproduction and migration of mosquitoes/birds, but decreased precipitation can also promote this in some cases ([*source*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4342965/)). In a study done for Chicago, Illinois for 2004-2008, an increase in temperature was found to be the greatest temporal predictor for an increased number of infected Culex pipiens and Culex restuans mosquitoes ([*source*](https://www.vetmed.wisc.edu/goldberglab/pdf/P069.pdf)). Lower precipitation was the strongest spatial predictor ([*source*](https://www.vetmed.wisc.edu/goldberglab/pdf/P069.pdf)). For some years, a drier spring followed by a wetter summer was observed to promote WNV ([*source*](https://www.vetmed.wisc.edu/goldberglab/pdf/P069.pdf)). In another study on Chicago, it was observed that preceeding warm winters increased the probability for WNV human cases ([*source*](https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0227160)). High humidity favours mosquito activity, and low humidity leads to the opposite ([*source*](https://www.orkin.com/pests/mosquitoes/when-are-mosquitoes-most-active)).
+
+Other than solely health concerns, WNV also has major economic consequences, with the 2012 outbreak in Texas causing an estimated $47 million in losses (largely due to lost workdays) ([*source*](https://www.climatecentral.org/news/west-nile-virus-season-to-last-longer-as-climate-changes-16450)).
+
+# Data Dictionary
+
+## Train and Test Dataset
+
+|Feature|Type|Description|
+|---|---|---|
+|**Id**|*integer*|ID of the record|
+|**Date**|*string*|Date that the WNV test is performed|
+|**Address**|*string*|Approximate address of the location of trap. This is sent to the GeoCoder|
+|**Species**|*string*|Species of mosquitoes|
+|**Block**|*float*|Block number of address|
+|**Street**|*float*|Street Name|
+|**Trap**|*string*|Id of the trap|
+|**AddressNumberAndStreet**|*string*|Approximate address returned from GeoCoder|
+|**Latitude, Longitude**|*list*|Latitude and Longitude returned from GeoCoder|
+|**AddressAccuracy**|*float*|Accuracy returned from GeoCoder|
+|**NumMosquitos**|*integer*|Number of mosquitoes caught in the trap|
+|**WnvPresent**|*integer*|Presence of West Nile Virus in these mosquitoes. 1 means WNV is present, and 0 means not present.|
+
+## Spray Dataset
+
+|Feature|Type|Description|
+|---|---|---|
+|**Date, Time**|*string*|the date and time of the spray|
+|**Latitude, Longitude**|*string*|Latitude and Longitude of the spray|
+
+## Weather Dataset 
+
+Weather data from 2007 to 2014. Column descriptions in noaa_weather_qclcd_documentation.pdf in the repo files folder.
+
+## Additional Calculated Feature after Feature Engineering
+
+|Feature|Type|Description|
+|---|---|---|
+|**rh**|*float*|Relative Humidity calculated from `Tavg` and `wet_bulb` feature in `Weather` Dataset.|
+
+# Exploratory Data Analysis (EDA)
+
+EDA was done based on the following aspects: 
+
+* Mosquito Species
+* Seasonality/ Time Periods
+* Spray & trap effectiveness and locations 
+* Weather impact on mosquitoes
+* Temperature, Humidity, Precipitation, Wind.
+  
+The general insights can be found below.
+
+## Mosquito Species
+
+There were 7 different species of mosquitoes that were caught in the traps that were laid throughout Chicago. **3 out 7 species were WNV positive**.
+
+## Seasonality/ Time Periods
+
+WNV peaks in August and occurs around July to September. 
+
+Our findings were similar to reported trends of WNV, with the peak of WNV **coinciding with summer** in Chicago and stretching into autumn (September). Warmer months in summer and early-autumn encourage mosquito propagation.
+
+## Spray & Trap Effectiveness and Locations
+
+It appears that spraying occurred in two main blocks. The first time was on two dates in August and September of 2011. 
+The second time was a more prolonged spraying campaign, taking place over 8 dates in July, August, and September of 2013. The second spray campaign was also more intensive in terms of the number of locations sprayed. 
+
+This was likely due to a large spike in infected mosquitos during that period, as there was a large spike in cases in August and September 2013. In 2013, 17.5% percent of traps contained WNV positive mosquitos.
+
+However, a closer look at the year 2013 reveals that **spraying did not necessarily reduce the number of mosquitos carrying WNV**. This could have been due to the **lack of strategic planning** of trap & spray locations.
+
+## Weather impact on mosquitoes
+
+Temperature, Humidity, Precipitation and Wind are key environmental factors that affect the rate of mosquito growth ([*source*](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4342965/)). 
+
+According to research, the optimal temperature for mosquito breeding is between 50 degree (minimum to be active) and 80 degree (for maximum activeness) ([*source*](https://www.mosquitosquad.com/central-illinois/about-us/blog/2018/july/how-does-weather-affect-mosquito-activity-/#:~:text=Heat%20and%20humidity&text=Temperature%20and%20mosquito%20activity%20goes,hard%20to%20function%20at%20all.)). WNV thrives in Chicago in temperatures between **55 to 80 degrees**.
+
+The ideal humidity level of mosquitos is around **50 to 90% relative humidity**. Mosquitoes also have a 40% shorter lifespan if humidity levels were to fall below 40% and they are held without food or water.
+
+There is an **inverse relationship between the average precipitation levels and the number of mosquitos found**. This could be due to rain disturbing stagnant waters. It could also be due to heavy rainfall which flushes eggs and larvae away, hence reducing the number of mosquitos ([source](https://www.researchgate.net/figure/Relationship-between-rainfall-and-mosquito-abundance_fig1_269767908#:~:text=Mosquitoes%20were%20more%20abundant%20during,with%20temperature%20and%20relative%20humidity.)).
+
+For wind speed, speeds above 8.5 miles per hour reduce the number of mosquitoes ([source](https://kestrelmeters.com/blogs/news/the-science-of-mosquito-abatement#:~:text=Wind%20works%20as%20a%20natural,MPH%20wind%20gust%20is%20substantial.)). 
+
+# Model Results
+
+The models with their details and metrics are as follows:
+
+|Model|Cross-validated Training ROC AUC Score|Testing ROC AUC score|Testing recall score|Testing accuracy score|
+|---|---|---|---|---|
+|**K-Nearest Neighbors**|0.78|0.75|0.54|0.82|
+|**Random Forest**|0.79|0.77|0.25|0.90|
+|**Support Vector Classifier**|0.81|0.80|0.55|0.83|
+|**Logistic Regression**|0.80|0.80|0.75|0.73|
+
+The Logistic Regression model scored better than the baseline KNN model, the Random Forest model and the SVC model in predicting whether the West Nile Virus was present in trap samples out of all trap samples with West Nile Virus. This was according to our metrics of ROC AUC and recall. It was the only model that met both our requirements (ROC AUC and recall both at least 0.7). Thus, Logistic Regression was the chosen model to classify our trap data. The cross-validation also showed that it should generalise well to unseen data. 
+
+The accuracy scores were not the metric we were looking at, as compared to recall. The accuracy score includes predicting WNV is not there when there is no WNV, as well as predicting WNV where it is there. The imbalanced test data would make the accuracy score high. This is because it is easy to predict that there is no WNV when there is none, due to the very high number of samples with no West Nile Virus. 
+
+Therefore, we used the recall score, which is how many positive samples were correctly identified out of all postitive samples. This would leave the negative samples out of the metric. The lower the recall, the more false negatives predicted by the model. In this case, false negatives would mean not detecting WNV where it is present, which is more serious than the opposite, false positives. With false positives, WNV is said to be present when it is not.
+
+# Cost-Benefit Analysis
+
+As part of the Chicago Department of Public Health (CDPH) to tackle the West Nile Virus (WNV), one of the efforts include spraying pesticides to reduce the population of mosquitioes to reduce the population of mosquitoes carrying WNV. As per our EDA, we find that the efforts for spraying pesticides were not necessarily targeted to high risk areas, possibly leading to cost-savings if our model is able to provide a prediction of high risk areas.
+
+The costs analysed here include the cost of the spraying of pesticides, while the benefits include the cost avoidance of medical and productivity costs from preventing cases of WNV through the spraying of pesticides in Chicago. The numbers calculated were as follows:
+
+The total cost for spraying the entire area of Chicago 14 times was $2172842 in 2021. 
+
+The weighted medical cost for each patient was $15574 in 2021.
+
+Spray efforts would have to reduce number of human cases by 100 in order to justify the cost of spraying the whole of Chicago every week for 3 months, but the average number of cases per year have generally been below 100. Even in 2013, which had the biggest outbreak in our dataset, there were only 66 recorded human cases ([source](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7241786/#sec009title)).
+
+As such, spraying the whole of Chicago on a weekly basis is evidently a costly and inefficient endeavour. A more effective approach would be to target spraying at areas that have a high predicted probability of WNV outbreak.
 
 
-#### Navigating Group Work
+# Conclusions
 
-This project will be executed as a group.  To make your team as effective and efficient as possible you should do the create a shared GitHub repo and project planning document as described in the deliverables section below.
+1. Presence of WNV is affected by time of year, with mosquito season peaking in July to September.
+2. The three biggest weather indicators that affected the mosquito outbreak were temperature, humidity, and precipitation:
+  - The ideal temperature range for mosquito breeding is 50 - 80° F
+  - The ideal humidity range is a relative humidity of 64 - 83
+  - Rain generally leads to less mosquitos in the short term, likely due to disturbance of stagnant water bodies. However, there is likely to be a spike in mosquitos after the rain due to creation of new stagnant water bodies.
+3. Previous spray efforts have been poorly targeted. Spraying in 2013 took place within range of less than 20% of infected areas. Our EDA suggests that past spray campaigns have had limited impact on containing the WNV outbreak.
 
-## Deliverables
+# Recommendations
 
-**GitHub Repo**
-
-1. Create a GitHub repository for the group. Each member should be added as a contributor.
-2. Retrieve the dataset and upload it into a directory named `assets`.
-3. Generate a .py or .ipynb file that imports the available data.
-
-**Project Planning**
-
-1. Define your deliverable - what is the end result?
-2. Break that deliverable up into its components, and then go further down the rabbit hole until you have actionable items. Document these using a project managment tool to track things getting done.  The tool you use is up to you; it could be Trello, a spreadsheet, GitHub issues, etc.
-3. Begin deciding priorities for each task. These are subject to change, but it's good to get an initial consensus. Order these priorities however you would like.
-4. You planning documentation (or a link to it) should be included in your GitHub repo.
-
-**EDA**
-
-1. Describe the data. What does it represent? What types are present? What does each data points' distribution look like? Discuss these questions, and your own, with your partners. Document your conclusions.
-2. What kind of cleaning is needed? Document any potential issues that will need to be resolved.
-
-**Note:** As you know, EDA is the single most important part of data science. This is where you should be spending most of your time. Knowing your data, and understanding the status of its integrity, is what makes or breaks a project.
-
-**Modeling**
-
-1. The goal is of course to build a model and make predictions that the city of Chicago can use when it decides where to spray pesticides! Your team should have a clean Jupyter Notebook that shows your EDA process, your modeling and predictions.
-2. Conduct a cost-benefit analysis. This should include annual cost projections for various levels of pesticide coverage (cost) and the effect of these various levels of pesticide coverage (benefit). *(Hint: How would we quantify the benefit of pesticide spraying? To get "maximum benefit," what does that look like and how much does that cost? What if we cover less and therefore get a lower level of benefit?)*
-3. Your final submission CSV should be in your GitHub repo.
-
-**Presentation**
-* Audience: You are presenting to members of the CDC. Some members of the audience will be biostatisticians and epidemiologists who will understand your models and metrics and will want more information. Others will be decision-makers, focusing almost exclusively on your cost-benefit analysis. Your job is to convince both groups of the best course of action in the same meeting and be able to answer questions that either group may ask.
-* The length of your presentation should not exceed 25 minutes (a rough guideline: 3 minute intro, 12 minutes on model, 5 minutes on cost-benefit analysis, 5 minutes on recommendations/conclusion).  Touch base with your teaching team ... er, manager... for specific logistic requirements!
-
----
-
-**Your project is due by 9:00 AM on Friday, 19th November**
-
----
-
-### Project Feedback + Evaluation
-
-For all projects, students will be evaluated on a simple 4 point scale (0-3 inclusive). Instructors will use this rubric when scoring student performance on each of the core project requirements:
-
-Score | Expectations
------ | ------------
-**0** | _Does not meet expectations. Try again._
-**1** | _Approaching expectations. Getting there..._
-**2** | _Meets expectations. Great job._
-**3** | _Surpasses expectations. Brilliant!_
-
-### Rubric
-
-Your final assessment ("grade" if you will) will be calculated based on a topical rubric (see below).  For each category, you will receive a score of 0-3.  From the rubric you can see descriptions of each score and what is needed to attain those scores.
-
-For Project 3 the evaluation categories are as follows:
-- [Organization](#organization)
-- [Data Structures](#data-structures)
-- [Python Syntax and Control Flow](#python-syntax-and-control-flow)
-- [Probability and Statistics](#probability-and-statistics)
-- [Modeling](#modeling)
-- [Presentation](#presentation)
-
-#### Organization
-
-Clearly commented, annotated and sectioned Jupyter notebook or Python script.  Comments and annotations add clarity, explanation and intent to the work.  Notebook is well-structured with title, author and sections. Assumptions are stated and justified.
+1. **Monitoring should begin towards the beginning of July and last until the end of September.** This should involve tracking weather changes as well as laying traps to monitor presence of WNV in the mosquito population.
+2. **Weather forecasts should be used to direct spraying efforts,** with special attention being paid to periods of warm weather following recent rainfall.
+3. **Our prediction model should be used to guide future spray campaigns.** With a recall of around 75%, it presents a 55% improvement on current spray efforts, which only correctly targeted 20% of outbreak areas.
 
 
-| Score | Status                     | Examples                                                                                                                                                                                                                                         |
-|-------|----------------------------|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0     | Does not Meet Expectations | 1. Comments and annotations are **absent** <br> 2. There is no clear notebook structure <br> 3. Assumptions are not stated                                                                                                                                       |
-| 1     | Approaching Expectations   | 1. Comments are present but generally unclear or uninformative (e.g., comments do not clarify, explain or interpret the code) <br> 2. There are some structural components like section/subsection headings <br> 3. Assumptions are stated but not justified |
-| 2     | Meets Expectations         | 1. Comments and annotations are clear and informative <br> 2. There is a clear structure to the notebook with title and appropriate sectioning <br> 3. Assumptions are both stated and justified                                                             |
-| 3     | Exceeds Expectations       | 1. Comments and annotations are clear, informative and insightful <br> 2. There is a helpful and cogent structure to the notebook that clarifies the analysis flow <br> 3. Assumptions are stated, justified and backed by evidence or insight               |
+These recommendations can be integrated by exporting our Logistic Regression model to a frontend application for scientists and biologists to use when collecting mosquito samples. By keying in the relevant data needed as input to the model, we will be able to gauge the probability of WNV being present in the trap.
 
-#### Data Structures
+If WNV is present in the sample, this indicates that the particular street surrounding the trap may be a hotspot. Pesticides should thus be deployed to exterminate carriers that may be potential zoonotic vectors for the disease to spread. This achieves our objective of increasing efficiency in West Nile Virus detection and thus reducing resource wastage.
 
-Python data structures including lists, dictionaries and imported structures (e.g. DataFrames), are created and used correctly.  The appropriate data structures are used in context.  Data structures are created and accessed using appropriate mechanisms such as comprehensions, slices, filters and copies.
+# Future Steps
 
-| Score | Status | Examples |
-|-------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0 | Does not Meet Expectations | 1. Appropriate data structures are not identified or implemented <br> 2. Data structures are not created appropriately <br> 3. Data structures are not accessed or used effectively |
-| 1 | Approaching Expectations | 1. Contextually appropriate data structures are identified in some but not all instances <br> 2. Data structures are created successfully but lacked efficiency or generality (e.g., structures were hard-coded with values that limits generalization; brute-force vs automatic creation/population of data) <br> 3. Data structures are accessed or used but best practices are not adopted |
-| 2 | Meets Expectations | 1. Contextually appropriate data structures are identified and implemented given the context of the problem <br> 2. Data structures are created in an effective manner <br> 3. Data structures are accessed and used following general programming and Pythonic best practices |
-| 3 | Exceeds Expectations | 1. Use or creation of data structures is clever and insightful <br> 2. Data structures are created in a way that reveals significant Pythonic understanding <br> 3. Data structures are used or applied in clever or insightful ways |
+- **More accurate data on weather should be gathered to input for model training and prediction.** Currently, weather data is mapped to traps depending on whether traps are nearer to station 1 or station 2. If more localized weather data can be obtained, this would greatly improve model fit and prediction.
 
-
-#### Python Syntax and Control Flow
-
-Python code is written correctly and follows standard style guidelines and best practices.  There are no runtime errors.  The code is expressive while being reasonably concise.
-
-| Score | Status | Examples |
-|-------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0 | Does not Meet Expectations | 1. Code has systemic syntactical issues <br> 2. Code generates incorrect results <br> 3. Code is disorganized and needlessly difficult |
-| 1 | Approaching Expectations | 1. Code is generally correct with some runtime errors <br> 2. Code logic is generally correct but does not produce the desired outcome <br> 3. Code is somewhat organized and follows some stylistic conventions |
-| 2 | Meets Expectations | 1. Code is syntactically correct (no runtime errors) <br> 2. Code generates desired results (logically correct) <br> 3. Code follows general best practices and style guidelines |
-| 3 | Exceeds Expectations | 1. Code adopts clever or advanced syntax <br> 2. Code generates desired results in an easily consumable manner (e.g., results are written to screen, file, pipeline, etc, as appropriate within the flow of the analysis) <br> 3. Code is exceptionally expressive, well formed and organized |
-
-
-#### Probability and Statistics
-
-Descriptive and inferential statistics are calculated and applied where appropriate.  Probabilistic reasoning is demonstrated.  There is a clear understanding of how probability and statistics affects the analysis being performed.
-
-| Score | Status | Examples |
-|-------|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0 | Does not Meet Expectations | 1. Descriptive statistical calculations are absent <br> 2. Inferential statistical calculations are absent <br> 3. Probabilities or statistics are not relevant given the context of the analysis |
-| 1 | Approaching Expectations | 1. Descriptive statistics are present in some cases <br> 2. Inferential statistics are present in some cases <br> 3. Probabilities or statistics are somewhat relevant to the analysis context |
-| 2 | Meets Expectations | 1. Descriptive statistics are calculated in all relevant situations <br> 2. Inferential statistics are calculated in all relevant situations <br> 3. Probabilities or statistics are relevant to the analysis |
-| 3 | Exceeds Expectations | 1. Descriptive statistics are calculated, interpreted and visualized (where appropriate) <br> 2. Inferential statistics are calculated, interpreted and visualized (where appropriate) <br> 3. Probabilities or statistics are leveraged to draw meaningful or insightful conclusions |
-
-#### Modeling
-
-Data is appropriately prepared for modeling.  Model choice matches the context of the data and the analysis.  Model hyperparameters are optimized.  Model evaluation is robust.  Model results are extracted and explained either visually, numerically or narratively.
-
-| Score | Status | Examples |
-|-------|----------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0 | Does not Meet Expectations | 1. Data is not prepared for modeling.<br>2. Models are not implemented or not implemented fully.<br>3. Model hyperparameters are not considered.<br>4. Model evaluation is not performed.<br>5. Model results are unavailable or not extracted. |
-| 1 | Approaching Expectations | 1. Data has some null values, inappropriate types and/or improper handling of categorical labels.<br>2. Model choice is questionable given the objective of the analysis.<br>3. Model hyperparameters are insufficiently or not optimized.<br>4. Model evaluation is performed but the evaluation is not generalizable.<br>5. Model results are extracted but not explained or interpreted. |
-| 2 | Meets Expectations | 1. Data is free from nulls and correctly typed for the given model.<br>2. Model choice is appropriate to the analysis.<br>3. Model hyperparameters are optimally selected.<br>4. Model evaluation reflects generalizeable performance.<br>5. Model results are extracted and explained either visually, numerically or naratively. |
-| 3 | Exceeds Expectations | 1. Data is pristinely prepared with creative or useful feature engineering.<br>2. Model selection is justified and demonstrates an awareness of tradeoffs.<br>3. Model hyperparameters are optimized and the optimization is demonstrated/justified.<br>4. Model evaluation reflects generalizable performance and is interpreted in the context of the analysis.<br>5. Model results are explained, interpreted and related to the overarching analysis goals. |
-
-
-#### Presentation
-
-The goal, methodology and results of your work are presented in a clear, concise and thorough manner.  The presentation is appropriate for the specified audience, and includes relevant and enlightening visual aides as appropriate.
-
-| Score | Status | Examples |
-|-------|----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 0 | Does not Meet Expectations | 1. The problem was not well explained or ambiguous. <br> 2. The level of technicality was far above or below the target audience. <br> 3. The presentation went substantially over or under time. <br> 4. The speaker's voice was difficult to hear of unclear. <br> 5. The presentation visuals did not seem to support the talk. |
-| 1 | Approaching Expectations | 1. The problem was stated but was not 100% clear. <br> 2. The level of technicality was was good at times, but too low or too high at other times given the target audience. <br> 3. The presentation was given went slightly over or under time. <br> 4. The speaker's voice was at times difficult to understand. <br> 5. The presentation visuals were generally helpful, but some of them were either too complex or disconnected from the narrative. |
-| 2 | Meets Expectations | 1. The problem was framed appropriately for the audience. <br> 2. The level of technicality was appropriate to the target audience. <br> 3. The presentation was given within the allocated timeframe. <br> 4. The speaker's voice had volume and clarity. <br> 5. The presentation visuals were helpful and supportive. |
-| 3 | Exceeds Expectations | 1. The problem was expertly stated and compelling. <br> 2. The level of technicality was perfect for the target audience. <br> 3. The presentation was given within the allocated timeframe and paced evenly throughout. <br> 4. The speaker's voice was clear, understandable and consistent. <br> 5. The presentation visuals provided distinct insight, supported the speaker from the background, and were not distracting. |
+- **Measure the efficacy of other methods of mosquito control that have been used elsewhere,** such as using larvicide, or releasing genetically-modified mosquitos. A holistic approach to mosquito control covers four key aspects ([source](https://www.epa.gov/mosquitocontrol/success-mosquito-control-integrated-approach)): 
+  1. ***Removing breeding habitats*** - This involves treatment or elimination of stagnant water sources.
+  2. ***Constructing structural barriers*** - Construction of screens in homes may help reduce bites.
+  3. ***Controlling mosquitos at the larval stage*** - This approach maximizes the effectiveness of pesticide application and minimizes its use. One method involves use of larvicide while another method of control involves releasing genetically-modified male mosquitos that pass on genes that kill female offspring, as only female mosquitos bite and spread diseases.
+  4. ***Controlling adult mosquitos*** - Using an EPA-registered pesticide is one of the fastest and best options to combat an outbreak of mosquito-borne disease being transmitted by adult mosquitoes. These pesticides are known as adulticides. Zenivex E4, which is currently used, is an adulticide.
